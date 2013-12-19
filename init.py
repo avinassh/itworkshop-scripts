@@ -2,9 +2,10 @@
 
 """ This script will initialize the local system, sets up the directory 
 structure, creates master-repo, solutions-repo and directory containing 
-all the students repo
+all the students repo. The students repo will be initialized by adding a 
+welcome message and also setting up git upstream url
 
-input : List of students ids
+input : List of students ids, Bitbucket credentials
 
 Structure:
 
@@ -65,9 +66,6 @@ student repo on Bitbucket:
 
 """
 
-#create a master-repo
-#create a solutions-repo
-
 import os
 from os import makedirs
 import sys
@@ -81,7 +79,6 @@ BB_PASSWORD = 'ohlongjohnson'
 students_info = json.loads(open('students-info.json', 'r').read())
 
 def init_solutions_repo():
-    #makedirs('solutions-repo')
     for student_id, student_email in students_info.iteritems():
         makedirs('solutions-repo/%s' % student_id)
 
@@ -97,8 +94,6 @@ def init_students_repo_directory():
         call('git remote add origin https://%s:%s@bitbucket.org/%s/%s.git' % (BB_USERNAME, BB_PASSWORD, BB_USERNAME, student_id), shell=True)
         call('git push -u origin master', shell=True)
         os.chdir('../../')
-        #call('pwd', shell=True)
-        #sys.exit()
 
 def init_master_repo():
     makedirs('master-repo/assignments/assignment-1')
