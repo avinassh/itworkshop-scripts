@@ -1,7 +1,11 @@
 #!/bin/python
 
 """ 
-This script will put assignments into the checked out repo
+This script will put assignments into the student repositories. First add new
+assignments in master-repo/assignments and commit your changes. The directory 
+name of the assignment is the assignment id (assignment-x) is required. 
+The script will first pull the student's repo from bitbucket, commit it and 
+then rsync the newly added assignment directory to the repo and then commit it.
 
 Input : List of students ids, assignment-id, commit message
 
@@ -32,7 +36,6 @@ def main():
         call('git pull', shell=True)
         call("git commit -m 'commit before adding assignment'", shell=True)
         rsync =  'rsync -r %s assignments/' % assignment_path
-        #print rsync
         call(rsync, shell=True)
         call('git add .', shell=True)
         call("git commit -m 'commit after adding assignments'", shell=True)
