@@ -3,13 +3,15 @@
 """ 
 This script will put assignments into the student repositories. First add new
 assignments in master-repo/assignments and commit your changes. The directory 
-name of the assignment is the assignment id (assignment-x) is required. 
+name of the newly added assignment is the assignment id (assignment-x) is required. 
 The script will first pull the student's repo from bitbucket, commit it and 
-then rsync the newly added assignment directory to the repo and then commit it.
+then rsync the newly added assignment directory to the repo and then push it.
 
 Input : List of students ids, assignment-id, commit message
 
 """
+
+# todo : what if the student update the repo during this process
 
 import sys
 import os
