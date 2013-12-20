@@ -16,9 +16,7 @@ from subprocess import call
 import requests
 from requests.auth import HTTPBasicAuth
 
-MASTER_REPO = '/Users/avi/Desktop/itworkshop/master-repo/'
-STUDENTS_REPO_DIRECTORY = '/Users/avi/Desktop/itworkshop/students-repo-directory/'
-SOLUTIONS_REPO = '/Users/avi/Desktop/itworkshop/solutions-repo/'
+from dir_settings import *
 
 BB_USERNAME = 'avinassh'
 BB_PASSWORD = 'ohlongjohnson'
