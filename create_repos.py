@@ -14,9 +14,7 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 
-BB_USERNAME = 'avinassh'
-BB_PASSWORD = 'ohlongjohnson'
-REPO_API_URL = 'https://api.bitbucket.org/2.0/repositories/'
+from bb_settings import *
 
 students_info = json.loads(open('students-info.json', 'r').read())
 

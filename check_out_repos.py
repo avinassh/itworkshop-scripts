@@ -17,10 +17,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from dir_settings import *
-
-BB_USERNAME = 'avinassh'
-BB_PASSWORD = 'ohlongjohnson'
-BB_REPO_BASE_URL = "https://%s:%s@bitbucket.org/%s/" % (BB_USERNAME, BB_PASSWORD, BB_USERNAME)
+from bb_settings import *
 #BB_REPO_BASE_URL =  "git@bitbucket.org:%s/" % BB_USERNAME
 
 students_info = json.loads(open('students-info.json', 'r').read())
