@@ -26,9 +26,8 @@ import shutil
 import tempfile
 import json
 
-MASTER_REPO = '/Users/avi/Desktop/itworkshop/master-repo/'
-STUDENTS_REPO_DIRECTORY = '/Users/avi/Desktop/itworkshop/students-repo-directory/'
-SOLUTIONS_REPO = '/Users/avi/Desktop/itworkshop/solutions-repo/'
+from dir_settings import *
+
 # build a dictionary of the commit log
 # commit_logs = {} 
 
