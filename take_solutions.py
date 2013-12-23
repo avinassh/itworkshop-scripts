@@ -77,12 +77,10 @@ def sync_solutions():
 # sync the assignment-id solutions folder with the appropriate students solution directory in solutions repo
 
 def main():
-    os.chdir(STUDENTS_REPO_DIRECTORY)
     for student_id, student_email in students_info.iteritems():
+        os.chdir(STUDENTS_REPO_DIRECTORY)
         os.chdir(student_id)
         sync_solutions()
-        #call('git pull', shell=True)
-        os.chdir(STUDENTS_REPO_DIRECTORY)
 
 if __name__ == '__main__':
     main()
