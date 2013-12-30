@@ -53,6 +53,7 @@ def sync_solutions():
     source_path = 'assignments/%s/solutions' % assignment_id
     dest_path = '%s%s/%s/' % (SOLUTIONS_REPO, student_id, assignment_id)
     call('rsync  %s %s' % (source_path, dest_path))
+    call('git checkout -', shell=True)
 
 
 def main():
