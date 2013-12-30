@@ -4,21 +4,21 @@ This repository contains the scripts required for the class IT Workshop Spring 2
 
 Following are the scripts should be run first (and only once).
 
-- create_repos.py : This script will create repositories for each student on Bitbucket
-- invite_users.py : This script will assign each student to their repository and also sends them an invite email
-- init.py : This script will create the required directory structure on teacher's local machine. Run this only after create_repos.py as this script will also initialize the student repositories by setting proper upstream etc.
+- `create_repos.py` : This script will create repositories for each student on Bitbucket
+- `invite_users.py` : This script will assign each student to their repository and also sends them an invite email
+- `init.py` : This script will create the required directory structure on teacher's local machine. Run this only after `create_repos.py`, as this script will also initialize the student repositories by setting proper upstream in git configuration etc.
 
-and then take_solutions.py script can be run whenever required. 
+and then `take_solutions.py` script can be run whenever required. 
 
 #Quick start:
 
-- The students' email ID and university ID should be provided in JSON (see 'students-info.json') and the file path should be updated in dir_settings.py  
-- Update the Bitbucket username and password in bb_settings file. Using these credentials students repositories will be created.
-- Run create_repos.py and invite_users.py subsequently. 
-- Run the init.py script to initialize the directory structure on the teacher's local machine. This script will work under current working directory and it will create directories : 'solutions-repo' and 'students-repo-directory'
-- Update the dir_settings.py accordingly.
+- The students' email ID and university ID should be provided in JSON (see `students-info.json`) and the file path should be updated in `dir_settings.py`  
+- Update the Bitbucket username and password in `bb_settings.py` file. Using these credentials students repositories will be created.
+- Run `create_repos.py` and `invite_users.py` subsequently. 
+- Run the `init.py` script to initialize the directory structure on the teacher's local machine. This script will work under current working directory and it will create directories : 'solutions-repo' and 'students-repo-directory'
+- Update the `dir_settings.py` accordingly.
 - ...
-- Whenever assignment solutions need to be taken out from student repo, then run take_solutions.py. Example usage:
+- Whenever assignment solutions need to be taken out from student repo, then run `take_solutions.py`. Example usage:
 		
 		$python take_solutions.py -d 'Dec 19 22:31:01 2013' -aid 'assignment-11'
 
