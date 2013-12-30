@@ -1,11 +1,10 @@
 #!/bin/python
 
 """ 
-This script will take assignment solutions from each student repository. First
-it will clone the repository in a temporary location. Based on the
-timestamp given, it finds out the last commit made before timestamp and it 
-checks out that revision, rsyncs the solution folder of the required assignment 
-with the solutions-repo.
+This script will take assignment solutions from each student repository. Based 
+on the timestamp given, it finds out the last commit made before timestamp 
+(i.e. deadline) and it checks out that revision, rsyncs the solution folder 
+of the required assignment with the solutions-repo.
 
 The timestamp should be of the format 'Month Date H:M:S Year' 
 
@@ -28,12 +27,10 @@ import json
 
 from dir_settings import *
 
-# build a dictionary of the commit log
-# commit_logs = {} 
-
 #given_timestamp = datetime.datetime.strptime('Dec 20 22:31:01 2013', "%b %d %H:%M:%S %Y")
 
 students_info = json.loads(open('students-info.json', 'r').read())
+
 
 def get_commit_hash(timestamp):
     (output, error) = subprocess.Popen('git log --pretty=format:"%H %ad" --date=local', 
@@ -47,34 +44,16 @@ def get_commit_hash(timestamp):
         if deadline > datetime.datetime.strptime(commit_timestamp, "%a %b %d %H:%M:%S %Y"):
             return commit_hash
 
-#commit_hash = get_commit_hash('Dec 20 22:31:01 2013')
-#print commit_hash
 
 def sync_solutions():
-    try:
-        assignment_id = 'assignment-1'
-        student_repo_path = os.getcwd()
-        call('git pull', shell=True)
-        tmp_dir = tempfile.mkdtemp()
-        call('rsync -r %s %s' %(student_repo_path, tmp_dir), shell=True)
-        os.chdir(tmp_dir)
-        commit_hash = get_commit_hash('Dec 20 22:31:01 2013')
-        call('git checkout %s' % commit_hash, shell=True)
-        source_path = 'assignments/%s/solutions' % assignment_id
-        dest_path = '%s%s/%s/' % (SOLUTIONS_REPO, student_id, assignment_id)
-        call('rsync  %s %s' % (source_path, dest_path))
-    finally:
-        try:
-            shutil.rmtree(tmp_dir)
-        except OSError as exc:
-            if exc.errno != 2:
-                raise
+    assignment_id = 'assignment-1'
+    call('git pull', shell=True)
+    commit_hash = get_commit_hash('Dec 20 22:31:01 2013')
+    call('git checkout %s' % commit_hash, shell=True)
+    source_path = 'assignments/%s/solutions' % assignment_id
+    dest_path = '%s%s/%s/' % (SOLUTIONS_REPO, student_id, assignment_id)
+    call('rsync  %s %s' % (source_path, dest_path))
 
-#steps, 
-# change to 'students-repo-directory' and iterate over each repo
-# do git pull to get the latest repo and make a copy of it in a temporary location
-# get the commit hash and check out the folder to that hash
-# sync the assignment-id solutions folder with the appropriate students solution directory in solutions repo
 
 def main():
     for student_id, student_email in students_info.iteritems():
