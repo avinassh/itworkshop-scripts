@@ -4,7 +4,7 @@
 This script will take assignment solutions from each student repository. Based 
 on the timestamp given, it finds out the last commit made before timestamp 
 (i.e. deadline) and it checks out that revision, rsyncs the solution folder 
-of the required assignment with the solutions-repo.
+of the required assignment with the solutions-repo and resets to HEAD.
 
 The timestamp should be of the format 'Month Date H:M:S Year' 
 
@@ -24,13 +24,20 @@ from subprocess import call
 import shutil
 import tempfile
 import json
+import argparse
 
 from dir_settings import *
+
+parser = argparse.ArgumentParser(description='This script will take assignment solutions from each student repository. Based on the timestamp given, it finds out the last commit made before timestamp (i.e. deadline) and it checks out that revision, rsyncs the solution folder of the required assignment with the solutions-repo and resets to HEAD.')
+parser.add_argument('-d','--deadline', help="The timestamp should be of the format 'Month Date H:M:S Year' e.g. Dec 19 22:31:01 2013", required=True)
+parser.add_argument('-aid','--assignment_id', help='Please provide assignment id of the solutions you want to copy. e.g. assignment-7', required=True)
+args = vars(parser.parse_args())
 
 #given_timestamp = datetime.datetime.strptime('Dec 20 22:31:01 2013', "%b %d %H:%M:%S %Y")
 
 students_info = json.loads(open(STUDENTS_INFO, 'r').read())
-
+assignment_id = args['assignment_id']
+deadline = args['deadline']
 
 def get_commit_hash(timestamp):
     (output, error) = subprocess.Popen('git log --pretty=format:"%H %ad" --date=local', 
@@ -46,9 +53,8 @@ def get_commit_hash(timestamp):
 
 
 def sync_solutions():
-    assignment_id = 'assignment-1'
     call('git pull', shell=True)
-    commit_hash = get_commit_hash('Dec 20 22:31:01 2013')
+    commit_hash = get_commit_hash(deadline)
     call('git checkout %s' % commit_hash, shell=True)
     source_path = 'assignments/%s/solutions' % assignment_id
     dest_path = '%s%s/%s/' % (SOLUTIONS_REPO, student_id, assignment_id)
