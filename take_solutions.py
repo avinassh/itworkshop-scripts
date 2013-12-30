@@ -12,6 +12,11 @@ eg. Dec 19 22:31:01 2013
 
 Input : List of students ids, assignment-id, timestamp
 
+Example usage: To take out solutions of assignment 11 whose deadline was 
+Dec 19 22:31:01 2013, run the following
+
+$python take_solutions.py -d 'Dec 19 22:31:01 2013' -aid 'assignment-11'
+
 """
 
 
@@ -28,16 +33,26 @@ import argparse
 
 from dir_settings import *
 
-parser = argparse.ArgumentParser(description='This script will take assignment solutions from each student repository. Based on the timestamp given, it finds out the last commit made before timestamp (i.e. deadline) and it checks out that revision, rsyncs the solution folder of the required assignment with the solutions-repo and resets to HEAD.')
-parser.add_argument('-d','--deadline', help="The timestamp should be of the format 'Month Date H:M:S Year' e.g. Dec 19 22:31:01 2013", required=True)
-parser.add_argument('-aid','--assignment_id', help='Please provide assignment id of the solutions you want to copy. e.g. assignment-7', required=True)
+parser = argparse.ArgumentParser(description='This script will take assignment \
+                                solutions from each student repository. Based \
+                                on the timestamp given, it finds out the last \
+                                commit made before timestamp (i.e. deadline) \
+                                and it checks out that revision, rsyncs the \
+                                solution folder of the required assignment \
+                                with the solutions-repo and resets to HEAD.')
+parser.add_argument('-d','--deadline', help='The timestamp should be of the \
+                    format "Month Date H:M:S Year" e.g. "Dec 19 22:31:01 2013"', 
+                    required=True)
+parser.add_argument('-aid','--assignment_id', help='Please provide assignment \
+                    id of the solutions you want to copy. e.g. assignment-7', 
+                    required=True)
 args = vars(parser.parse_args())
-
-#given_timestamp = datetime.datetime.strptime('Dec 20 22:31:01 2013', "%b %d %H:%M:%S %Y")
 
 students_info = json.loads(open(STUDENTS_INFO, 'r').read())
 assignment_id = args['assignment_id']
 deadline = args['deadline']
+
+print deadline
 
 def get_commit_hash(timestamp):
     (output, error) = subprocess.Popen('git log --pretty=format:"%H %ad" --date=local', 

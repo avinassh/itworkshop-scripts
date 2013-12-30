@@ -39,7 +39,7 @@ solutions-repo:
 .
 |-20130X00X
 
-directory containing all student's repos:
+directory containing all students repos:
 student-repositories:
 |-201301001 (the student id)
 |-201301002
