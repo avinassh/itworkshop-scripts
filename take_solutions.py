@@ -29,7 +29,7 @@ from dir_settings import *
 
 #given_timestamp = datetime.datetime.strptime('Dec 20 22:31:01 2013', "%b %d %H:%M:%S %Y")
 
-students_info = json.loads(open('students-info.json', 'r').read())
+students_info = json.loads(open(STUDENTS_INFO, 'r').read())
 
 
 def get_commit_hash(timestamp):

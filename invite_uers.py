@@ -13,11 +13,10 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 
-BB_USERNAME = 'avinassh'
-BB_PASSWORD = 'ohlongjohnson'
-INVITE_API_URL = 'https://bitbucket.org/api/1.0/invitations'
+from bb_settings import *
+from dir_settings import *
 
-students_info = json.loads(open('students-info.json', 'r').read())
+students_info = json.loads(open(STUDENTS_INFO, 'r').read())
 
 def invite_user_to_repo(repo_name, invitee_email):
     auth = HTTPBasicAuth(BB_USERNAME, BB_PASSWORD)

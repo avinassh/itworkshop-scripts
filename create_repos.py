@@ -15,8 +15,9 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from bb_settings import *
+from dir_settings import *
 
-students_info = json.loads(open('students-info.json', 'r').read())
+students_info = json.loads(open(STUDENTS_INFO, 'r').read())
 
 def create_repo(repo_name):
     auth = HTTPBasicAuth(BB_USERNAME, BB_PASSWORD)

@@ -73,10 +73,10 @@ import shutil
 import json
 from subprocess import call
 
-BB_USERNAME = 'avinassh'
-BB_PASSWORD = 'ohlongjohnson'
+from bb_settings import *
+from dir_settings import *
 
-students_info = json.loads(open('students-info.json', 'r').read())
+students_info = json.loads(open(STUDENTS_INFO, 'r').read())
 
 def init_solutions_repo():
     for student_id, student_email in students_info.iteritems():
