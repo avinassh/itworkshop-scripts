@@ -40,3 +40,6 @@ nosetests.xml
 
 # vritual-env
 venv/
+
+# settings file
+dir_settings.py
