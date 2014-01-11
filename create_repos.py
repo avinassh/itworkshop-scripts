@@ -6,6 +6,12 @@ The repo name will be same as the university ID of the student.
 
 Input : List of students ids, Bitbucket credentials
 
+usage:
+$python create_repos.py 
+
+the above will consider the file path mentioned in dir_settings.py
+
+$python create_repos.py students-info.json
 """
 
 import sys
@@ -17,7 +23,12 @@ from requests.auth import HTTPBasicAuth
 from bb_settings import *
 from dir_settings import *
 
-students_info = json.loads(open(STUDENTS_INFO, 'r').read())
+
+if len(sys.argv) == 2:
+    students_info = json.loads(open(sys.argv[1], 'r').read())
+else:
+    students_info = json.loads(open(STUDENTS_INFO, 'r').read())
+
 
 def create_repo(repo_name):
     auth = HTTPBasicAuth(BB_USERNAME, BB_PASSWORD)
@@ -29,9 +40,11 @@ def create_repo(repo_name):
     print repo_name, response.status_code
     #print response.text
 
+
 def main():
     for student_id, student_email in students_info.iteritems():
         create_repo(student_id)
+
 
 if __name__ == '__main__':
             main()        
