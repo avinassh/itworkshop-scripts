@@ -43,3 +43,4 @@ venv/
 
 # settings file
 dir_settings.py
+bb_settings.py
