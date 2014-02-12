@@ -20,7 +20,9 @@ $python take_solutions.py -d 'Dec 19 22:31:01 2013' -aid 'assignment-11'
 
 To do: 
 - git_log_cmd with format string in get_commit_hash()
-- dest_path should be global?
+- dest_path is ugly
+- dest_path should be global?  
+- Ruler: 78!!
 """
 
 
@@ -29,18 +31,15 @@ import os
 import time
 import datetime
 import subprocess
-from subprocess import call
-import shutil
-import tempfile
 import json
 import argparse
 import shlex
+import logging
+import datetime
+from logging.handlers import TimedRotatingFileHandler
 
 from dir_settings import *
 from bb_settings import *
-
-SOLUTIONS_DIRECTORY = 'solutions-directory/'
-STUDENTS_REPO_DIRECTORY = 'students-repo-directory/'
 
 parser = argparse.ArgumentParser(description='This script will take assignment solutions from each student repository. Based on the timestamp given, it finds out the last commit made before timestamp (i.e. deadline) and it checks out that revision, rsyncs the solution folder of the required assignment with the solutions-repo and resets to HEAD.')
 parser.add_argument('-d','--deadline', help='The timestamp should be of the \
@@ -49,18 +48,23 @@ parser.add_argument('-d','--deadline', help='The timestamp should be of the \
 parser.add_argument('-aid','--assignment_id', help='Please provide assignment \
                     id of the solutions you want to copy. e.g. assignment-7', 
                     required=True)
-args = vars(parser.parse_args())
 
+NITRO_LOGGER = logging.getLogger('NITRO')
+LOG_FILENAME = 'nitro.log'
+SOLUTIONS_DIRECTORY = 'solutions-directory/'
+STUDENTS_REPO_DIRECTORY = 'students-repo-directory/'
 students_info = json.loads(open(STUDENTS_INFO, 'r').read())
+DEST_PATH = SOLUTIONS_DIRECTORY + assignment_id + '-' + '-'.join(deadline.split()) + '/'
+
+args = vars(parser.parse_args())
 assignment_id = args['assignment_id']
 deadline = args['deadline']
-DEST_PATH = SOLUTIONS_DIRECTORY + assignment_id + '-' + '-'.join(deadline.split()) + '/'
 
 
 def get_commit_hash(repo_name, timestamp):
     git_log_cmd = shlex.split('git --git-dir=' + STUDENTS_REPO_DIRECTORY + repo_name + '/.git log --pretty=format:"%H %ad" --date=local')
     try:
-        (output, error) = subprocess.Popen(git_log_cmd, stdout=subprocess.PIPE).communicate()
+        (output, error) = subprocess.Popen(git_log_cmd, stdout=subprocess.PIPE, stderr=LOG_FD).communicate()
         for git_log in string.split(output, os.linesep):
             deadline = datetime.datetime.strptime(timestamp, "%b %d %H:%M:%S %Y")
             # split the commit message by first white space, the returning list will 
@@ -70,51 +74,54 @@ def get_commit_hash(repo_name, timestamp):
             if deadline > datetime.datetime.strptime(commit_timestamp, "%a %b %d %H:%M:%S %Y"):
                 return commit_hash
     except Exception, e:
-        raise e
-
+        NITRO_LOGGER.error("git clone failed for repo %s: %s" % (repo_name, str(e)))
+        #raise e
+        
 
 def sync_solutions(repo_name):
+
     def repo_exists(repo_name):
         return os.path.isdir(STUDENTS_REPO_DIRECTORY + repo_name)
 
     def clone_repo(repo_name):
         clone_cmd = shlex.split("git clone %s%s %s%s" % (BB_REPO_BASE_URL, 
                                 repo_name, STUDENTS_REPO_DIRECTORY, repo_name))
-        #print clone_cmd
+        # NITRO_LOGGER.debug(clone_cmd)
         try:
-            subprocess.check_call(clone_cmd)#, stdout=LOG_FD, stderr=LOG_FD)
+            subprocess.check_call(clone_cmd, stdout=LOG_FD, stderr=LOG_FD)
         except Exception, e:
-            raise e
+            NITRO_LOGGER.error("git clone failed for repo %s: %s" % (repo_name, str(e)))
 
     def pull_repo(repo_name):
         pull_cmd = shlex.split("git --git-dir=%s/.git pull" % \
                             (STUDENTS_REPO_DIRECTORY + repo_name))
-        #print pull_cmd
+        # NITRO_LOGGER.debug(pull_cmd)
         try:
-            subprocess.check_call(pull_cmd)#, stdout=LOG_FD, stderr=LOG_FD)
+            subprocess.check_call(pull_cmd, stdout=LOG_FD, stderr=LOG_FD)
         except Exception, e:
-            raise e
+            NITRO_LOGGER.error("git pull failed for repo %s: %s" % (repo_name, str(e)))
 
     def checkout_version(repo_name, commit_hash='-'):
         try:
             checkout_cmd = shlex.split("git --git-dir=%s/.git checkout %s" \
                                 % ((STUDENTS_REPO_DIRECTORY + repo_name), commit_hash))
-            # print "git --git-dir=%s/.git checkout %s" \
-            #                     % ((STUDENTS_REPO_DIRECTORY + repo_name), commit_hash)
-            subprocess.check_call(checkout_cmd)#, stdout=LOG_FD, stderr=LOG_FD)
+            # NITRO_LOGGER.debug(checkout_cmd)
+            # I want to ignore the entire output of checkout_cmd
+            subprocess.check_call(checkout_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except Exception, e:
-            raise e
+            NITRO_LOGGER.error("git checkout failed for repo %s tag %s: %s" % (repo_name, commit_hash, str(e)))
+            #raise e
 
 
     def rsync(repo_name):
         src_path = STUDENTS_REPO_DIRECTORY + repo_name + '/assignments/' + assignment_id
         if not os.path.isdir(src_path):
-            # either student messed up the dir structure or hasn't submitted his assginments
+            # either student messed up the dir structure or hasn't submitted his assignments
             return
         if not os.path.isdir(DEST_PATH + repo_name):
             os.makedirs(DEST_PATH + repo_name)
-        rsync_cmd = 'rsync -rt %s %s' % (src_path, DEST_PATH + repo_name)
-        subprocess.check_call(rsync_cmd, shell=True)
+        rsync_cmd = shlex.split('rsync -rt %s %s' % (src_path, DEST_PATH + repo_name))
+        subprocess.check_call(rsync_cmd, stdout=LOG_FD, stderr=LOG_FD)
 
     if repo_exists(repo_name):
         pull_repo(repo_name)
@@ -125,20 +132,25 @@ def sync_solutions(repo_name):
     if commit_hash:
         checkout_version(repo_name, commit_hash)
         rsync(repo_name)
+        checkout_version(repo_name)
     else:
         #student has not made any commit before deadline
         return
 
-    # call('git pull', shell=True)
-    # commit_hash = get_commit_hash(deadline)
-    # call('git checkout %s' % commit_hash, shell=True)
-    # source_path = 'assignments/%s/solutions' % assignment_id
-    # dest_path = '%s%s/%s/' % (SOLUTIONS_REPO, student_id, assignment_id)
-    # call('rsync  %s %s' % (source_path, dest_path))
-    # call('git checkout -', shell=True)
 
+def setup_logging():
+    NITRO_LOGGER.setLevel(logging.DEBUG)   # make log level a setting
+    # Add the log message handler to the logger
+    myhandler = TimedRotatingFileHandler(LOG_FILENAME, when='midnight', 
+                                        backupCount=5)
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %I:%M:%S %p')
+    myhandler.setFormatter(formatter)
+    NITRO_LOGGER.addHandler(myhandler)
+    
 
-def main():
+def init():
     if not os.path.isdir(STUDENTS_REPO_DIRECTORY):
         os.makedirs(STUDENTS_REPO_DIRECTORY)
     if not os.path.isdir(SOLUTIONS_DIRECTORY):
@@ -146,12 +158,17 @@ def main():
     if not os.path.isdir(DEST_PATH):
         os.makedirs(DEST_PATH)
 
+
+def main():
+    NITRO_LOGGER.debug('****Firing up NITRO***')
+    init()
     for student_id, student_email in students_info.iteritems():
-        #os.chdir(STUDENTS_REPO_DIRECTORY)
-        #os.chdir(student_id)
-        #print i, student_id
+        NITRO_LOGGER.debug(student_id)
         sync_solutions(student_id)
+    NITRO_LOGGER.debug('****Done with NITRO***')
 
 
 if __name__ == '__main__':
+    LOG_FD = open(LOG_FILENAME, 'a')
+    setup_logging()
     main()
