@@ -23,10 +23,10 @@ def delete_repo(repo_name):
     response = requests.delete(url=url, auth=auth)
     print response.status_code
 
-def main():
+def delete_repos():
     for student_id, student_email in students_info.iteritems():
         delete_repo(student_id)
         
 
 if __name__ == '__main__':
-            main()        
+    pass 

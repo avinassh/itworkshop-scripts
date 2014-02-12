@@ -7,7 +7,7 @@ in following format
     "201301003" : "anotherguy@gmail.com"
 }
 
-and it will save it as student-info.json
+and it will save it as students-info.json
 
 usage:
 $python csvtojson.py mycsv.csv
@@ -22,7 +22,7 @@ def csvtojson():
     data = {}
     for row_no, student_id, student_name, student_email in csv.reader(open(sys.argv[1])):
         data[student_id] = student_email
-    f = open('student-info.json', 'w+') 
+    f = open('students-info.json', 'w+') 
     f.write(json.dumps(data))
 
 

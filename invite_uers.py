@@ -5,6 +5,12 @@ This script will send the invitation email to the all the students
 
 Input : List of students (their ids and email ids), Bitbucket credentials
 
+usage:
+$python invite_users.py 
+
+the above will consider the students info file mentioned in dir_settings.py
+
+$python invite_users.py students-info.json
 """
 
 import sys
@@ -16,7 +22,10 @@ from requests.auth import HTTPBasicAuth
 from bb_settings import *
 from dir_settings import *
 
-students_info = json.loads(open(STUDENTS_INFO, 'r').read())
+if len(sys.argv) == 2:
+    students_info = json.loads(open(sys.argv[1], 'r').read())
+else:
+    students_info = json.loads(open(STUDENTS_INFO, 'r').read())
 
 def invite_user_to_repo(repo_name, invitee_email):
     auth = HTTPBasicAuth(BB_USERNAME, BB_PASSWORD)

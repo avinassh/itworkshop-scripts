@@ -42,9 +42,10 @@ def create_repo(repo_name):
 
 
 def main():
-    for student_id, student_email in students_info.iteritems():
-        create_repo(student_id)
-
+    #for student_id, student_email in students_info.iteritems():
+        #create_repo(student_id)
+    create_repo("201264095")
+    create_repo("201301037")
 
 if __name__ == '__main__':
             main()        
